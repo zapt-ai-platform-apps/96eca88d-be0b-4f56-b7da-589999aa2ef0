@@ -1,6 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import TaskItem from './TaskItem';
 import EmptyState from './EmptyState';
+import TaskForm from './TaskForm';
+import SearchAndFilter from './SearchAndFilter';
+import Stats from './Stats';
+import { saveTodos, loadTodos } from '../services/localStorageService';
 
 export default function TodoList() {
   const [task, setTask] = useState('');
@@ -8,7 +12,29 @@ export default function TodoList() {
   const [isAdding, setIsAdding] = useState(false);
   const [animateIn, setAnimateIn] = useState(false);
   const [filter, setFilter] = useState('all'); // 'all', 'active', 'completed'
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [priority, setPriority] = useState('none');
+  const [sortOption, setSortOption] = useState('newest');
+  const [showStats, setShowStats] = useState(false);
   const inputRef = useRef(null);
+
+  // Load todos from localStorage on initial render
+  useEffect(() => {
+    const storedTodos = loadTodos();
+    if (storedTodos.length > 0) {
+      console.log('Loaded todos from localStorage:', storedTodos.length);
+      setTodos(storedTodos);
+    }
+  }, []);
+
+  // Save todos to localStorage whenever they change
+  useEffect(() => {
+    if (todos.length > 0) {
+      saveTodos(todos);
+      console.log('Saved todos to localStorage:', todos.length);
+    }
+  }, [todos]);
 
   // Focus input on mount
   useEffect(() => {
@@ -22,11 +48,20 @@ export default function TodoList() {
     setIsAdding(true);
     
     setTimeout(() => {
-      const newTodo = { id: Date.now(), text: task.trim(), completed: false };
+      const newTodo = { 
+        id: Date.now(), 
+        text: task.trim(), 
+        completed: false,
+        dueDate: selectedDate ? selectedDate.toISOString() : null,
+        priority: priority,
+        createdAt: new Date().toISOString()
+      };
       setTodos(prevTodos => [...prevTodos, newTodo]);
       setAnimateIn(true);
       console.log('Added todo:', newTodo);
       setTask('');
+      setSelectedDate(null);
+      setPriority('none');
       setIsAdding(false);
       
       // Reset animation state after animation completes
@@ -63,94 +98,106 @@ export default function TodoList() {
     }, 300);
   };
 
-  const filteredTodos = todos.filter(todo => {
-    if (filter === 'active') return !todo.completed;
-    if (filter === 'completed') return todo.completed;
-    return true; // 'all'
-  });
+  const sortTodos = (todosToSort) => {
+    switch (sortOption) {
+      case 'newest':
+        return [...todosToSort].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      case 'oldest':
+        return [...todosToSort].sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0));
+      case 'dueDate':
+        return [...todosToSort].sort((a, b) => {
+          if (!a.dueDate) return 1;
+          if (!b.dueDate) return -1;
+          return new Date(a.dueDate) - new Date(b.dueDate);
+        });
+      case 'priority':
+        const priorityValues = { high: 3, medium: 2, low: 1, none: 0 };
+        return [...todosToSort].sort((a, b) => 
+          priorityValues[b.priority || 'none'] - priorityValues[a.priority || 'none']
+        );
+      case 'alphabetical':
+        return [...todosToSort].sort((a, b) => a.text.localeCompare(b.text));
+      default:
+        return todosToSort;
+    }
+  };
+
+  const filteredAndSortedTodos = sortTodos(
+    todos.filter(todo => {
+      // First filter by status
+      if (filter === 'active' && todo.completed) return false;
+      if (filter === 'completed' && !todo.completed) return false;
+      
+      // Then filter by search term if one exists
+      if (searchTerm.trim() !== '') {
+        return todo.text.toLowerCase().includes(searchTerm.toLowerCase());
+      }
+      
+      return true;
+    })
+  );
 
   const activeTodoCount = todos.filter(todo => !todo.completed).length;
   const completedTodoCount = todos.filter(todo => todo.completed).length;
 
   return (
     <div className="card shadow-fancy overflow-hidden">
-      <div className="bg-gradient-to-r from-dark-700 to-dark-700 p-5 rounded-t-xl border-b border-dark-500">
-        <div className="flex items-center gap-3 mb-1">
-          <div className="relative w-full">
-            <input
-              ref={inputRef}
-              type="text"
-              placeholder="What needs to be done?"
-              value={task}
-              onChange={(e) => setTask(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="input-primary pr-12 w-full"
-              disabled={isAdding}
-            />
-            {task.length > 0 && (
-              <button 
-                onClick={() => setTask('')}
-                className="absolute right-12 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors cursor-pointer"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-              </button>
-            )}
-          </div>
-          <button
-            onClick={handleAddTask}
-            disabled={isAdding || !task.trim()}
-            className="btn-primary whitespace-nowrap h-10 min-w-20 flex items-center justify-center cursor-pointer"
-          >
-            {isAdding ? (
-              <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            ) : (
-              'Add Task'
-            )}
-          </button>
-        </div>
-        <div className="text-xs text-gray-500 pl-1">Press Enter to quickly add a task</div>
-      </div>
+      <TaskForm 
+        task={task}
+        setTask={setTask}
+        isAdding={isAdding}
+        handleAddTask={handleAddTask}
+        handleKeyDown={handleKeyDown}
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+        priority={priority}
+        setPriority={setPriority}
+      />
 
       <div className="p-5">
         {todos.length === 0 ? (
           <EmptyState />
         ) : (
           <div>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 mb-4">
+            <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-medium text-gray-200">Your Tasks</h2>
-              <div className="flex gap-2 text-sm">
-                <button 
-                  onClick={() => setFilter('all')}
-                  className={`px-2 py-1 rounded transition-colors ${filter === 'all' ? 'bg-dark-500 text-primary-400' : 'text-gray-400 hover:text-gray-300'} cursor-pointer`}
-                >
-                  All ({todos.length})
-                </button>
-                <button 
-                  onClick={() => setFilter('active')}
-                  className={`px-2 py-1 rounded transition-colors ${filter === 'active' ? 'bg-dark-500 text-primary-400' : 'text-gray-400 hover:text-gray-300'} cursor-pointer`}
-                >
-                  Active ({activeTodoCount})
-                </button>
-                <button 
-                  onClick={() => setFilter('completed')}
-                  className={`px-2 py-1 rounded transition-colors ${filter === 'completed' ? 'bg-dark-500 text-primary-400' : 'text-gray-400 hover:text-gray-300'} cursor-pointer`}
-                >
-                  Completed ({completedTodoCount})
-                </button>
-              </div>
+              <button 
+                onClick={() => setShowStats(!showStats)}
+                className="text-sm px-3 py-1 rounded bg-dark-600 text-primary-400 flex items-center gap-1 hover:bg-dark-500 cursor-pointer transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5z" />
+                  <path d="M8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7z" />
+                  <path d="M14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+                </svg>
+                {showStats ? 'Hide Stats' : 'Show Stats'}
+              </button>
             </div>
+            
+            {showStats && <Stats todos={todos} />}
 
-            {filteredTodos.length === 0 ? (
+            <SearchAndFilter 
+              filter={filter}
+              setFilter={setFilter}
+              totalCount={todos.length}
+              activeCount={activeTodoCount}
+              completedCount={completedTodoCount}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              sortOption={sortOption}
+              setSortOption={setSortOption}
+            />
+
+            {filteredAndSortedTodos.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
-                {filter === 'active' ? 'No active tasks. Well done!' : 
+                {searchTerm ? 'No matching tasks found.' : 
+                 filter === 'active' ? 'No active tasks. Well done!' : 
                  filter === 'completed' ? 'No completed tasks yet.' : 
                  'No tasks available.'}
               </div>
             ) : (
               <ul className="space-y-1 max-h-96 overflow-y-auto pr-1">
-                {filteredTodos.map((todo, index) => (
+                {filteredAndSortedTodos.map((todo, index) => (
                   <TaskItem 
                     key={todo.id}
                     todo={todo}
@@ -164,16 +211,23 @@ export default function TodoList() {
             )}
             
             {completedTodoCount > 0 && (
-              <div className="mt-4 pt-4 border-t border-dark-500 flex justify-end">
+              <div className="mt-4 pt-4 border-t border-dark-500 flex justify-between">
                 <button 
                   onClick={() => {
-                    const activeTodos = todos.filter(todo => !todo.completed);
-                    setTodos(activeTodos);
+                    const completedTodos = todos.filter(todo => todo.completed);
+                    if (window.confirm(`Are you sure you want to delete ${completedTodos.length} completed task(s)?`)) {
+                      const activeTodos = todos.filter(todo => !todo.completed);
+                      setTodos(activeTodos);
+                    }
                   }}
                   className="text-sm text-red-400 hover:text-red-300 transition-colors cursor-pointer"
                 >
-                  Clear completed
+                  Clear completed ({completedTodoCount})
                 </button>
+                
+                <div className="text-sm text-gray-400">
+                  {activeTodoCount} active task{activeTodoCount !== 1 ? 's' : ''} remaining
+                </div>
               </div>
             )}
           </div>
