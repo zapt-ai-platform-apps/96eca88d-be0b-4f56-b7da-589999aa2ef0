@@ -8,6 +8,13 @@ const priorityColors = {
   none: 'text-gray-400'
 };
 
+const priorityBackgrounds = {
+  high: 'bg-red-500/10',
+  medium: 'bg-yellow-500/10',
+  low: 'bg-green-500/10',
+  none: 'bg-gray-500/10'
+};
+
 export default function TaskItem({ todo, onToggle, onDelete, animateIn, isLast }) {
   const getDueDateText = () => {
     if (!todo.dueDate) return null;
@@ -15,32 +22,45 @@ export default function TaskItem({ todo, onToggle, onDelete, animateIn, isLast }
     const dueDate = new Date(todo.dueDate);
     
     if (isPast(dueDate) && !isToday(dueDate)) {
-      return <span className="text-red-400">Overdue: {formatDistanceToNow(dueDate, { addSuffix: true })}</span>;
+      return (
+        <span className="pill bg-red-500/20 text-red-400">
+          Overdue: {formatDistanceToNow(dueDate, { addSuffix: true })}
+        </span>
+      );
     } else if (isToday(dueDate)) {
-      return <span className="text-yellow-400">Due today</span>;
+      return (
+        <span className="pill bg-yellow-500/20 text-yellow-400">
+          Due today
+        </span>
+      );
     } else {
-      return <span className="text-gray-400">Due {formatDistanceToNow(dueDate, { addSuffix: true })}</span>;
+      return (
+        <span className="pill bg-gray-700/50 text-gray-400">
+          Due {formatDistanceToNow(dueDate, { addSuffix: true })}
+        </span>
+      );
     }
   };
 
-  const priorityIcon = (priority) => {
+  const priorityTag = (priority) => {
     if (!priority || priority === 'none') return null;
     
+    const colorClass = priorityColors[priority] || priorityColors.none;
+    const bgClass = priorityBackgrounds[priority] || priorityBackgrounds.none;
+    
     return (
-      <span className={`mr-1 ${priorityColors[priority] || priorityColors.none}`}>
-        {priority === 'high' && '!!!'}
-        {priority === 'medium' && '!!'}
-        {priority === 'low' && '!'}
+      <span className={`pill ${bgClass} ${colorClass} mr-2`}>
+        {priority.charAt(0).toUpperCase() + priority.slice(1)}
       </span>
     );
   };
 
   return (
     <li 
-      className={`task-item group ${todo.completed ? 'bg-dark-700' : ''} ${todo.deleting ? 'animate-slide-out opacity-0' : animateIn && isLast ? 'animate-bounce-in' : ''}`}
+      className={`task-item group ${todo.completed ? 'bg-dark-700/50' : ''} ${todo.deleting ? 'animate-slide-out opacity-0' : animateIn && isLast ? 'animate-bounce-in' : ''}`}
     >
-      <div className="flex flex-col">
-        <div className="flex items-center">
+      <div className="flex flex-col w-full">
+        <div className="flex items-center w-full">
           <label className="checkbox-container">
             <input
               type="checkbox"
@@ -50,21 +70,21 @@ export default function TaskItem({ todo, onToggle, onDelete, animateIn, isLast }
             />
             <span className="checkbox-mark"></span>
           </label>
-          <span className={`${todo.completed ? 'task-completed' : 'task-text'}`}>
-            {priorityIcon(todo.priority)}
+          <span className={`${todo.completed ? 'task-completed' : 'task-text'} mr-auto`}>
             {todo.text}
           </span>
         </div>
         
-        {todo.dueDate && (
-          <div className="pl-8 text-xs mt-1">
+        {(todo.dueDate || (todo.priority && todo.priority !== 'none')) && (
+          <div className="pl-8 text-xs mt-1.5 flex flex-wrap gap-1.5">
+            {priorityTag(todo.priority)}
             {getDueDateText()}
           </div>
         )}
       </div>
       <button
         onClick={() => onDelete(todo.id)}
-        className="delete-btn cursor-pointer"
+        className="delete-btn cursor-pointer ml-2 p-1 hover:bg-dark-500 rounded-full"
         aria-label="Delete task"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

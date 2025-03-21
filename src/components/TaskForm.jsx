@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { DayPicker } from 'react-day-picker';
 import { format } from 'date-fns';
 import 'react-day-picker/dist/style.css';
@@ -27,9 +27,20 @@ export default function TaskForm({
     setSelectedDate(null);
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (datePickerRef.current && !datePickerRef.current.contains(event.target)) {
+        setShowDatePicker(false);
+      }
+    };
+    
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
-    <div className="bg-gradient-to-r from-dark-700 to-dark-700 p-5 rounded-t-xl border-b border-dark-500">
-      <div className="flex flex-col gap-3">
+    <div className="bg-gradient-to-r from-surface-dark to-surface p-5 rounded-t-xl border-b border-dark-500">
+      <div className="flex flex-col gap-4">
         <div className="flex items-center gap-3">
           <div className="relative w-full">
             <input
@@ -38,7 +49,7 @@ export default function TaskForm({
               value={task}
               onChange={(e) => setTask(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="input-primary pr-12 w-full"
+              className="input-primary pr-12 w-full focus:shadow-glow"
               disabled={isAdding}
             />
             {task.length > 0 && (
@@ -55,41 +66,46 @@ export default function TaskForm({
           <button
             onClick={handleAddTask}
             disabled={isAdding || !task.trim()}
-            className="btn-primary whitespace-nowrap h-10 min-w-20 flex items-center justify-center cursor-pointer"
+            className="btn-primary whitespace-nowrap h-10 min-w-20 flex items-center justify-center cursor-pointer shadow-button"
           >
             {isAdding ? (
               <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             ) : (
-              'Add Task'
+              <span className="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Add Task
+              </span>
             )}
           </button>
         </div>
         
         <div className="flex flex-wrap gap-3 items-center text-sm">
           <div className="flex items-center gap-2">
-            <div className="text-gray-400">Priority:</div>
-            <div className="flex bg-dark-600 rounded-lg overflow-hidden">
+            <div className="text-gray-400 whitespace-nowrap">Priority:</div>
+            <div className="flex bg-dark-600 rounded-lg overflow-hidden shadow-inner-glow">
               <button
                 onClick={() => setPriority('none')}
-                className={`px-3 py-1 ${priority === 'none' ? 'bg-dark-500 text-gray-200' : 'text-gray-400'} cursor-pointer`}
+                className={`px-3 py-1.5 ${priority === 'none' ? 'bg-dark-500 text-gray-200' : 'text-gray-400'} cursor-pointer transition-colors`}
               >
                 None
               </button>
               <button
                 onClick={() => setPriority('low')}
-                className={`px-3 py-1 ${priority === 'low' ? 'bg-dark-500 text-green-400' : 'text-gray-400'} cursor-pointer`}
+                className={`px-3 py-1.5 ${priority === 'low' ? 'bg-dark-500 text-green-400' : 'text-gray-400'} cursor-pointer transition-colors`}
               >
                 Low
               </button>
               <button
                 onClick={() => setPriority('medium')}
-                className={`px-3 py-1 ${priority === 'medium' ? 'bg-dark-500 text-yellow-400' : 'text-gray-400'} cursor-pointer`}
+                className={`px-3 py-1.5 ${priority === 'medium' ? 'bg-dark-500 text-yellow-400' : 'text-gray-400'} cursor-pointer transition-colors`}
               >
                 Medium
               </button>
               <button
                 onClick={() => setPriority('high')}
-                className={`px-3 py-1 ${priority === 'high' ? 'bg-dark-500 text-red-400' : 'text-gray-400'} cursor-pointer`}
+                className={`px-3 py-1.5 ${priority === 'high' ? 'bg-dark-500 text-red-400' : 'text-gray-400'} cursor-pointer transition-colors`}
               >
                 High
               </button>
@@ -99,8 +115,10 @@ export default function TaskForm({
           <div className="relative">
             <button
               onClick={() => setShowDatePicker(!showDatePicker)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg cursor-pointer ${
-                selectedDate ? 'bg-primary-700 text-primary-200' : 'bg-dark-600 text-gray-400 hover:text-gray-300'
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg cursor-pointer shadow-inner-glow transition-all duration-200 ${
+                selectedDate 
+                  ? 'bg-primary-700/80 text-primary-100 hover:bg-primary-700/90' 
+                  : 'bg-dark-600 text-gray-400 hover:text-gray-300 hover:bg-dark-500'
               }`}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -111,7 +129,7 @@ export default function TaskForm({
               {selectedDate && (
                 <button 
                   onClick={clearDate}
-                  className="ml-1 text-gray-400 hover:text-gray-200"
+                  className="ml-1 text-gray-400 hover:text-gray-200 transition-colors"
                 >
                   ×
                 </button>
@@ -121,7 +139,7 @@ export default function TaskForm({
             {showDatePicker && (
               <div 
                 ref={datePickerRef}
-                className="absolute z-10 mt-1 bg-dark-600 rounded-lg shadow-xl p-2 border border-dark-500"
+                className="absolute z-10 mt-1 glass-panel rounded-lg shadow-card p-2 animate-fade-in border border-dark-500/80"
               >
                 <DayPicker
                   mode="single"
@@ -143,7 +161,12 @@ export default function TaskForm({
           </div>
         </div>
       </div>
-      <div className="text-xs text-gray-500 pl-1 mt-1">Press Enter to quickly add a task</div>
+      <div className="text-xs text-gray-500 pl-1 mt-2 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1 text-primary-500/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+        <span>Press Enter to quickly add a task</span>
+      </div>
     </div>
   );
 }

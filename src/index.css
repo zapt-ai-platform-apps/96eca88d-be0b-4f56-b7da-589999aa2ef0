@@ -8,15 +8,19 @@
   body {
     @apply font-sans text-gray-200 bg-gradient-to-br from-background-light to-background-dark min-h-screen;
   }
+
+  #root {
+    @apply min-h-screen flex flex-col;
+  }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-gradient-to-br from-primary-500 to-primary-600 hover:from-primary-400 hover:to-primary-500 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-opacity-50;
+    @apply bg-gradient-to-br from-primary-500 to-primary-600 hover:from-primary-400 hover:to-primary-500 text-white font-medium py-2 px-4 rounded-lg shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-opacity-50 disabled:opacity-60 disabled:pointer-events-none;
   }
   
   .btn-secondary {
-    @apply bg-dark-600 text-primary-400 border border-dark-400 hover:border-primary-500 hover:bg-dark-500 font-medium py-2 px-4 rounded-lg shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-opacity-50;
+    @apply bg-dark-600 text-primary-400 border border-dark-400 hover:border-primary-500 hover:bg-dark-500 font-medium py-2 px-4 rounded-lg shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-opacity-50 disabled:opacity-60 disabled:pointer-events-none;
   }
   
   .input-primary {
@@ -24,7 +28,7 @@
   }
   
   .card {
-    @apply bg-surface rounded-xl shadow-soft p-4 transition-all duration-200 border border-dark-500;
+    @apply bg-surface rounded-xl shadow-lg p-0 transition-all duration-200 border border-dark-500 overflow-hidden backdrop-blur-sm;
   }
   
   .checkbox-container {
@@ -60,7 +64,7 @@
   }
   
   .task-item {
-    @apply flex items-center justify-between p-3 mb-2 rounded-lg transition-all duration-200 hover:bg-dark-600;
+    @apply flex items-center justify-between p-3 mb-2 rounded-lg transition-all duration-200 hover:bg-dark-600 border border-transparent hover:border-dark-500;
   }
   
   .task-text {
@@ -74,22 +78,66 @@
   .delete-btn {
     @apply text-gray-500 hover:text-red-400 transition-colors duration-200 opacity-0 group-hover:opacity-100;
   }
+
+  .filter-button {
+    @apply px-3 py-1.5 rounded transition-colors cursor-pointer;
+  }
+
+  .filter-button-active {
+    @apply bg-dark-500 text-primary-400;
+  }
+
+  .filter-button-inactive {
+    @apply text-gray-400 hover:text-gray-300;
+  }
+
+  .glass-panel {
+    @apply bg-dark-700/90 backdrop-blur-md border border-dark-600/50 shadow-xl;
+  }
+
+  .pill {
+    @apply rounded-full px-3 py-0.5 text-xs font-medium;
+  }
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1a1a1a;
+  background: rgba(26, 26, 26, 0.1);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #444444;
+  background: rgba(68, 68, 68, 0.5);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555555;
+  background: rgba(85, 85, 85, 0.7);
+}
+
+/* DayPicker custom styles */
+.rdp {
+  --rdp-cell-size: 32px;
+  --rdp-accent-color: #0080ff;
+  --rdp-background-color: #1e1e1e;
+  --rdp-accent-color-dark: #0080ff;
+  --rdp-background-color-dark: #2a2a2a;
+  --rdp-outline: none;
+  --rdp-outline-selected: none;
+  margin: 0;
+}
+
+.rdp-day_selected, 
+.rdp-day_selected:focus-visible, 
+.rdp-day_selected:hover {
+  background-color: var(--rdp-accent-color);
+  color: white;
+}
+
+.rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
+  background-color: var(--rdp-background-color-dark);
 }

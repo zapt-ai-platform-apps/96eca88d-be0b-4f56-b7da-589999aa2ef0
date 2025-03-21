@@ -12,15 +12,15 @@ export default function SearchAndFilter({
   setSortOption
 }) {
   return (
-    <div className="mb-4 space-y-3">
-      <div className="bg-dark-700 p-2 rounded-lg">
+    <div className="mb-5 space-y-3">
+      <div className="glass-panel p-2 rounded-lg shadow-inner-glow">
         <div className="relative">
           <input
             type="text"
             placeholder="Search tasks..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 pr-4 py-2 w-full bg-dark-600 rounded-lg text-gray-200 focus:outline-none focus:ring-1 focus:ring-primary-400 box-border"
+            className="pl-9 pr-4 py-2 w-full bg-dark-600/80 rounded-lg text-gray-200 focus:outline-none focus:ring-1 focus:ring-primary-400 focus:shadow-glow box-border backdrop-blur-xs"
           />
           <svg 
             xmlns="http://www.w3.org/2000/svg" 
@@ -45,40 +45,52 @@ export default function SearchAndFilter({
         </div>
       </div>
       
-      <div className="flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0">
+      <div className="flex flex-col sm:flex-row justify-between space-y-3 sm:space-y-0 sm:items-center">
         <div className="flex gap-2 text-sm">
           <button 
             onClick={() => setFilter('all')}
-            className={`px-3 py-1.5 rounded transition-colors ${filter === 'all' ? 'bg-dark-500 text-primary-400' : 'text-gray-400 hover:text-gray-300'} cursor-pointer`}
+            className={`filter-button ${filter === 'all' ? 'filter-button-active' : 'filter-button-inactive'}`}
           >
             All ({totalCount})
           </button>
           <button 
             onClick={() => setFilter('active')}
-            className={`px-3 py-1.5 rounded transition-colors ${filter === 'active' ? 'bg-dark-500 text-primary-400' : 'text-gray-400 hover:text-gray-300'} cursor-pointer`}
+            className={`filter-button ${filter === 'active' ? 'filter-button-active' : 'filter-button-inactive'}`}
           >
             Active ({activeCount})
           </button>
           <button 
             onClick={() => setFilter('completed')}
-            className={`px-3 py-1.5 rounded transition-colors ${filter === 'completed' ? 'bg-dark-500 text-primary-400' : 'text-gray-400 hover:text-gray-300'} cursor-pointer`}
+            className={`filter-button ${filter === 'completed' ? 'filter-button-active' : 'filter-button-inactive'}`}
           >
             Completed ({completedCount})
           </button>
         </div>
         
         <div className="text-sm">
-          <select 
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-            className="bg-dark-600 text-gray-300 border border-dark-500 rounded-lg px-3 py-1.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary-400 box-border"
-          >
-            <option value="newest">Sort by newest</option>
-            <option value="oldest">Sort by oldest</option>
-            <option value="dueDate">Sort by due date</option>
-            <option value="priority">Sort by priority</option>
-            <option value="alphabetical">Sort alphabetically</option>
-          </select>
+          <div className="relative">
+            <select 
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
+              className="appearance-none glass-panel text-gray-300 rounded-lg px-9 py-1.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary-400 box-border pr-10"
+            >
+              <option value="newest">Sort by newest</option>
+              <option value="oldest">Sort by oldest</option>
+              <option value="dueDate">Sort by due date</option>
+              <option value="priority">Sort by priority</option>
+              <option value="alphabetical">Sort alphabetically</option>
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 left-2 flex items-center text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+              </svg>
+            </div>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+              <svg className="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" fillRule="evenodd"></path>
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
     </div>
