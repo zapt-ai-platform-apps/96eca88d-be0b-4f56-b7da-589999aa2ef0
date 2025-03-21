@@ -60,7 +60,7 @@
   }
   
   .task-item {
-    @apply flex items-center justify-between p-3 mb-2 rounded-lg transition-all duration-200 hover:bg-gray-50 group;
+    @apply flex items-center justify-between p-3 mb-2 rounded-lg transition-all duration-200 hover:bg-gray-50;
   }
   
   .task-text {
