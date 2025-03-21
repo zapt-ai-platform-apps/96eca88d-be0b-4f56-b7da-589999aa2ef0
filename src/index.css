@@ -24,7 +24,7 @@
   }
   
   .card {
-    @apply bg-surface-DEFAULT rounded-xl shadow-soft p-4 transition-all duration-200 border border-dark-500;
+    @apply bg-surface rounded-xl shadow-soft p-4 transition-all duration-200 border border-dark-500;
   }
   
   .checkbox-container {
