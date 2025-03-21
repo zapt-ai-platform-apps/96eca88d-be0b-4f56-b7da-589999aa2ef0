@@ -6,7 +6,7 @@
 
 @layer base {
   body {
-    @apply font-sans text-gray-800 bg-gradient-to-br from-background-light to-background-dark min-h-screen;
+    @apply font-sans text-gray-200 bg-gradient-to-br from-background-light to-background-dark min-h-screen;
   }
 }
 
@@ -16,15 +16,15 @@
   }
   
   .btn-secondary {
-    @apply bg-white text-primary-600 border border-gray-200 hover:border-primary-400 hover:bg-primary-50 font-medium py-2 px-4 rounded-lg shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-opacity-50;
+    @apply bg-dark-600 text-primary-400 border border-dark-400 hover:border-primary-500 hover:bg-dark-500 font-medium py-2 px-4 rounded-lg shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-opacity-50;
   }
   
   .input-primary {
-    @apply block w-full px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all duration-200 box-border;
+    @apply block w-full px-4 py-2 text-gray-200 bg-dark-600 border border-dark-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all duration-200 box-border;
   }
   
   .card {
-    @apply bg-white rounded-xl shadow-soft p-4 transition-all duration-200;
+    @apply bg-surface-DEFAULT rounded-xl shadow-soft p-4 transition-all duration-200 border border-dark-500;
   }
   
   .checkbox-container {
@@ -36,7 +36,7 @@
   }
   
   .checkbox-mark {
-    @apply absolute top-0 left-0 w-5 h-5 rounded-md border-2 border-gray-300 transition-all duration-200;
+    @apply absolute top-0 left-0 w-5 h-5 rounded-md border-2 border-dark-300 transition-all duration-200;
   }
   
   .checkbox-input:checked ~ .checkbox-mark {
@@ -60,19 +60,19 @@
   }
   
   .task-item {
-    @apply flex items-center justify-between p-3 mb-2 rounded-lg transition-all duration-200 hover:bg-gray-50;
+    @apply flex items-center justify-between p-3 mb-2 rounded-lg transition-all duration-200 hover:bg-dark-600;
   }
   
   .task-text {
-    @apply transition-all duration-200 text-gray-700 group-hover:text-gray-900;
+    @apply transition-all duration-200 text-gray-300 group-hover:text-gray-100;
   }
   
   .task-completed {
-    @apply line-through text-gray-400 group-hover:text-gray-500;
+    @apply line-through text-gray-500 group-hover:text-gray-400;
   }
   
   .delete-btn {
-    @apply text-gray-400 hover:text-red-500 transition-colors duration-200 opacity-0 group-hover:opacity-100;
+    @apply text-gray-500 hover:text-red-400 transition-colors duration-200 opacity-0 group-hover:opacity-100;
   }
 }
 
@@ -82,14 +82,14 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #1a1a1a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #444444;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #555555;
 }

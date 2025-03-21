@@ -3,7 +3,7 @@ import React from 'react';
 export default function TaskItem({ todo, onToggle, onDelete, animateIn, isLast }) {
   return (
     <li 
-      className={`task-item group ${todo.completed ? 'bg-gray-50' : ''} ${todo.deleting ? 'animate-slide-out opacity-0' : animateIn && isLast ? 'animate-bounce-in' : ''}`}
+      className={`task-item group ${todo.completed ? 'bg-dark-700' : ''} ${todo.deleting ? 'animate-slide-out opacity-0' : animateIn && isLast ? 'animate-bounce-in' : ''}`}
     >
       <div className="flex items-center">
         <label className="checkbox-container">
